@@ -1,0 +1,705 @@
+{
+  "name": "News AI Otomotif",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "a3811107-96e7-4bf6-b29a-e1af695b1b6f",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [-260, 1100],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9aec0a09-4b6f-4fca-98e6-789abd5fdc51",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "id": "56277e54-31a0-4804-ad23-c9ee6d244641",
+              "name": "content",
+              "type": "string",
+              "value": "={{ $json.contentSnippet }}"
+            },
+            {
+              "id": "a3586a80-588e-42d1-9780-370a956ddf6b",
+              "name": "link",
+              "type": "string",
+              "value": "={{ $json.link }}"
+            },
+            {
+              "id": "58f01618-8014-4685-9192-d15d596ffcd9",
+              "name": "isoDate",
+              "type": "number",
+              "value": "={{ new Date($json.isoDate).getTime() }}"
+            },
+            {
+              "id": "716bb078-8df3-4d96-8a1b-4aec4f8cf206",
+              "name": "categories",
+              "type": "array",
+              "value": "={{ $json.categories }}"
+            },
+            {
+              "id": "bab09945-bab7-42d2-a1bb-da1f622b85be",
+              "name": "contentSnippet",
+              "value": "={{ $json.contentSnippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e4a84626-cc7d-4264-83af-3be210c8b9f9",
+      "name": "Transform date",
+      "type": "n8n-nodes-base.set",
+      "position": [800, 1100],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "e7cf09fb-af35-495d-a840-341f8d0ddcd8",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "leftValue": "={{ $json.isoDate }}",
+              "rightValue": "={{ Date.now() - 7 * 24 * 60 * 60 * 1000 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e8e823d1-2fc7-4084-ab6b-cda3a382e3b8",
+      "name": "Filter by date (more than 7 days)",
+      "type": "n8n-nodes-base.filter",
+      "position": [1000, 1100],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "isoDate",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a60a48e7-30eb-47cd-83c8-451e152f94a2",
+      "name": "Sort by date",
+      "type": "n8n-nodes-base.sort",
+      "position": [1200, 1100],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "id": "73140c7c-ec10-4b1e-a2a4-8fc689ec733e",
+      "name": "Limit news to x",
+      "type": "n8n-nodes-base.limit",
+      "position": [1400, 1100],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 9
+      },
+      "id": "9985735e-b6e9-4038-9b43-7427bf1c6889",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [360, 1100],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "content": "## RSS sources \nHere you can add up to nine sources of RSS. To do so, modify the merge node for the number of RSS feeds you want, duplicate the RSS node and wire it to the trigger and the merge node\n",
+        "height": 1680,
+        "width": 520,
+        "color": 4
+      },
+      "id": "26112f20-8a2f-43a9-b24b-7b3565fa2618",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-20, 820],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Age and number of the news \nHere you can set the number of days behind by changing the 7 by any number in the filter by date node:\n```\nDate.now() - 7 * 24 * 60 * 60 * 1000\n```\nYou can also modify the number of news in the \"limit news to x\" node",
+        "height": 360,
+        "width": 640,
+        "color": 5
+      },
+      "id": "013f9a47-484e-4b5e-a336-e332413e1351",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [740, 900],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## RSS Feed News Processing and Distribution Workflow\n\n### Who is this for?\n\nThis workflow is designed for professionals and teams who need to monitor multiple RSS feeds, filter the latest content, and distribute actionable updates as a Trello comment. Ideal for content managers, marketers, and team leads managing news or content pipelines.\n\n### What problem is this workflow solving?\n\nManually monitoring RSS feeds and keeping track of the latest content can be time-consuming. This workflow automates the aggregation, filtering, and distribution of news, ensuring that only relevant and timely updates are shared with your team or audience.\n\n### What this workflow does:\n1. Aggregates RSS Feeds: Pulls data from up to three RSS feeds simultaneously.\n2. Filters Content: Filters articles based on their publication date (default: last 7 days).\n3. Organizes and Sorts: Sorts filtered articles by date for clarity.\n4. Formats Updates: Transforms news items into Markdown format for better readability.\n5. Publishes and Notifies: Posts comments to Trello cards and sends an email to a moderator to check the comment.\n\n### Setup:\n1. Connect your RSS feeds by configuring the RSS Read nodes.\n2. Link your Trello and Gmail accounts for seamless integration.\n3. Adjust the schedule trigger to set how often the workflow should run (e.g., daily, weekly).\n4. Test the workflow to ensure all connections and configurations are correct.\n\n### How to customize this workflow to your needs:\n- Change the Number of RSS Feeds: Add or remove RSS Read nodes and update the merge configuration accordingly.\n- Adjust the Date Filter: Modify the date logic in the “Filter by date” node to include more or fewer days.\n- Limit the Number of Articles: Adjust the limit in the “Limit news to x” node.\n- Custom Formatting: Update the Transform node to format the news items differently.\n- Alternative Notifications: Replace Trello and Gmail with other integrations, such as Slack or Microsoft Teams.\n\nThis workflow ensures your team stays informed with minimal effort and delivers content updates in an organized and professional manner.",
+        "height": 1120,
+        "width": 500,
+        "color": 7
+      },
+      "id": "815f459c-16b3-4542-b7b5-58aa7a8b5131",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-820, 320],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chatId": "yourchatid",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [3000, 1100],
+      "id": "062a59e4-5047-46e8-94c3-84ba63062ee0",
+      "name": "Telegram",
+      "webhookId": "41be3019-987d-41b6-9b05-60746e5176dd",
+      "credentials": {
+        "telegramApi": {
+          "id": "Cgtycy8K7hHcc30K",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.cnnindonesia.com/nasional/rss",
+        "options": {}
+      },
+      "id": "b50952fa-5cc6-40dc-acce-0f0c09e12358",
+      "name": "RSS cnnindonesia",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 940],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.cnbcindonesia.com/entrepreneur/rss",
+        "options": {}
+      },
+      "id": "28332c60-ee62-4980-a975-44e386a7677b",
+      "name": "RSS cnbcindonesia",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 1100],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://lapi.kumparan.com/v3.0/rss",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "23784413-2010-47b6-a1f3-66d6c16a7c88",
+      "name": "RSS kumparan",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 1260],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.tempo.co",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "06290d0f-b255-4f8e-ab06-a7d45ab534ef",
+      "name": "RSS tempo",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 1440],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sindikasi.okezone.com/index.php/rss/0/RSS2.0",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "0decb0cc-dc92-4781-b0a2-53bc97f01fcc",
+      "name": "RSS okezone",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 1620],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const title = item.json.title || \"\";\n  const content = item.json.content || item.json.contentSnippet || \"\";\n  return {\n    json: {\n      title,\n      content,\n      link: item.json.link,\n      categories: item.json.categories || [],\n      text: `${title} - ${content}`\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1620, 1100],
+      "id": "1938231d-bfe0-4af6-a22d-6939a409eb6d",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Buatkan ringkasan dalam format EXECUTIVE SUMMARY dari kumpulan berita berikut. \nFormat output harus ringkas, mudah dibaca level eksekutif, gunakan poin-poin dengan ikon/emoji, dan sertakan angka/kuantifikasi bila memungkinkan. \nHindari penjelasan panjang, fokus pada insight strategis.\n\nGunakan template berikut:\n\n# 📊 EXECUTIVE SUMMARY: Ringkasan Kumpulan Berita\n\n## 🔑 KEY INSIGHT\n👉 [Satu kalimat insight utama yang menghubungkan berita-berita ini]\n\n## 📝 SITUATION\n- [Konteks 1]  \n- [Konteks 2]  \n- [Konteks 3]\n\n## 📈 IMPACT\n- 💰 [Dampak ekonomi/bisnis, sertakan angka]  \n- 👥 [Dampak ke masyarakat/pengguna, sertakan estimasi]  \n- 🌍 [Dampak strategis/regional/global]\n\n## ✅ RECOMMENDATION\n1. 🚀 [Rekomendasi 1] → [Hasil yang diharapkan]  \n2. 🛠️ [Rekomendasi 2] → [Hasil yang diharapkan]  \n3. 🔒 [Rekomendasi 3] → [Hasil yang diharapkan]  \n\n## 🛠 REQUIRED RESOURCES\n- 👩‍💼 [Orang/Tim]  \n- 💵 [Budget]  \n- ⏱️ [Waktu]\n\n## ⏭️ NEXT STEPS\n👉 [Tindakan spesifik yang perlu dilakukan HARI INI]\n\n---\n\nKumpulan berita:  \n{{$json.text}}\ncantumkan link sumber berita\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [2440, 1100],
+      "id": "99ca9cf3-11d4-4b55-ab8e-d728a2fc3a1b",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "a9jVKZO4vN2yfj42",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nlet text = \"\";\n\nitems.forEach((item, index) => {\n  const title = item.json.title || \"Tanpa Judul\";\n  const content = item.json.contentSnippet || item.json.content || \"\";\n  const link = item.json.link || \"\";\n\n  text += `${index + 1}. Judul: ${title}\\n`;\n  if (content) text += `Isi: ${content}\\n`;\n  if (link) text += `Sumber: ${link}\\n`;\n  text += `\\n`; // spasi antar berita\n});\n\nreturn [{ json: { text } }];\n"
+      },
+      "id": "6c3e1c82-bcd1-4320-aafd-040f6a572d66",
+      "name": "Prepare Batch Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1840, 1100]
+    },
+    {
+      "parameters": {
+        "url": "https://www.antaranews.com/rss/top-news.xml",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "cffa52fc-ca3d-4731-b1db-fdadd03dc192",
+      "name": "RSS antaranews",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 1980],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.republika.co.id/rss",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "cefce221-0d53-4417-bc7e-0c9bdd2e8aa5",
+      "name": "RSS republika",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 1800],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a summary in the EXECUTIVE SUMMARY format from the following news collection.\nSelect only 5–10 strategic news articles on topics such as economy, investment, politics, automotive, and environment (no less than 5, no more than 10).\nPrioritize automotive-related news (e.g., Toyota, Honda, Tesla, EV industry, automotive regulations, supply chain, mobility trends, etc.).\nUse the results of the sentiment analysis (positive/negative/neutral) from each article as important rating criteria. Ignore minor news, duplicates, or irrelevant content.\nEach selected article MUST include a complete source link.\nThe output format must be concise, easy to read at an executive level, utilize bullet points with icons/emoji, and include numbers/quantification when possible.\nAvoid lengthy explanations; focus on strategic insights.\nPlease provide the output in Indonesian.\nUse the following template:\n\n📊 EXECUTIVE SUMMARY: News Collection Summary\n🔑 KEY INSIGHT\n\n👉 [One sentence summarizing the main insight that connects these articles]\n\n📝 SITUATION\n\n[Context 1 + sentiment direction]\n\n[Context 2 + sentiment direction]\n\n[Context 3 + sentiment direction]\n\n📈 IMPACT\n\n💰 [Economic/business impact, include numbers]\n\n👥 [Impact on society/users, include estimates]\n\n🌍 [Strategic/regional/global impact]\n\n✅ RECOMMENDATION\n\n🚀 [Recommendation 1] → [Expected outcome]\n\n🛠️ [Recommendation 2] → [Expected outcome]\n\n🔒 [Recommendation 3] → [Expected outcome]\n\n🛠 REQUIRED RESOURCES\n\n👩‍💼 [Person/Team needed]\n\n💵 [Budget]\n\n⏱️ [Time needed for implementation]\n\n⏭️ NEXT STEPS\n\n👉 [Specific actions needed to be taken TODAY]\n\n📊 SOURCE ANALYSIS\n\nTotal initial news: XX\n\nSelected: YY (5-10 strategic articles)\n\nSentiment Distribution: 🟢 Positive = A | 🔴 Negative = B | ⚪ Neutral = C\n\nReason for filtering: [e.g., duplicates, minor news, irrelevant, etc.]\n\nNews Collection (with sentiment analysis results added):\n{{$json.text}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [2080, 1100],
+      "id": "d81e81d9-0c96-4753-9885-9dcc64afbd93",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [2260, 1260],
+      "id": "1a7a4d80-3a73-40bb-a770-1092f51a96f1",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Gqttz8kazdLBGVnY",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://rakyatsulsel.fajar.co.id/feed/",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "ef46ce02-439c-432f-875b-5a8ea09c272c",
+      "name": "RSS fajar sulsel",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 2160],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://news.detik.com/berita/rss",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "592be7a5-b793-46f8-9a29-2a713e6b4a77",
+      "name": "RSS detik",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [80, 2340],
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "yourchatid",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [3000, 1320],
+      "id": "3b4e9005-55fb-4ef9-97cf-e37fccef6dcb",
+      "name": "Telegram1",
+      "webhookId": "41be3019-987d-41b6-9b05-60746e5176dd",
+      "credentials": {
+        "telegramApi": {
+          "id": "LR7Xqf9AHDdfWIvH",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Transform date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort by date": {
+      "main": [
+        [
+          {
+            "node": "Limit news to x",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform date": {
+      "main": [
+        [
+          {
+            "node": "Filter by date (more than 7 days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit news to x": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS kumparan",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS cnbcindonesia",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS cnnindonesia",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS tempo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS okezone",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS republika",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS antaranews",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS fajar sulsel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS detik",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter by date (more than 7 days)": {
+      "main": [
+        [
+          {
+            "node": "Sort by date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS cnnindonesia": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS cnbcindonesia": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS kumparan": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "RSS tempo": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "RSS okezone": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Prepare Batch Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [[]]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Batch Prompt": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS republika": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "RSS antaranews": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS fajar sulsel": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "RSS detik": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 8
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Makassar",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "a2599590-f8ba-4f30-b271-db504088a486",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b0aa00a16ba8819770e2a41e925547640b26075c40032e7542ffecbe09719fe"
+  },
+  "id": "ODP2PVD2XlPmt9F2",
+  "tags": []
+}
