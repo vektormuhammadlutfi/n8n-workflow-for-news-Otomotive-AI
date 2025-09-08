@@ -2,6 +2,8 @@
 
 Automated workflow for aggregating, filtering, summarizing, and distributing strategic news from multiple Indonesian RSS sources, with a focus on automotive topics. Integrates AI summarization and Telegram notifications.
 
+![Workflow Diagram](https://raw.githubusercontent.com/vektormuhammadlutfi/n8n-workflow-for-news-Otomotive-AI/main/image.png)
+
 ## Features
 
 - Aggregates news from up to 9 RSS feeds (CNN Indonesia, CNBC Indonesia, Kumparan, Tempo, Okezone, Republika, Antara News, Fajar Sulsel, Detik).
